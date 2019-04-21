@@ -11,37 +11,38 @@ template<size_t N, typename T = double,
 class DE
 {
 public:
-	DE(FuncTF, FuncF = [](T fb, T fm, T fw) { return 0.1 + 0.8 * (fm - fb) / (fw - fb + _eps); },
-		FuncCR = [](T fi, T fmin, T fmax) { 0.1 + 0.5 * (fi - fmin) / (fmax - fmin + _eps); },
-		int = 8 * N, int = 30, T = 1e-8);
+	static constexpr T _eps = 1e-8;
+
+	DE(FuncTF tf, FuncF f = [](T fb, T fm, T fw)
+	{
+		return 0.1 + 0.8 * (fm - fb) / (fw - fb + DE<N, T, FuncTF, FuncF, FuncCR>::_eps);
+	}, FuncCR cr = [](T fi, T fmin, T fmax)
+	{
+		return 0.1 + 0.5 * (fi - fmin) / (fmax - fmin + DE<N, T, FuncTF, FuncF, FuncCR>::_eps);
+	}, int np = 8 * N, int g = 30);
 
 	// 进行迭代，传入参数为每个个体每一维的上下界
-	Population<N, T> solve(const std::vector<T>&, const std::vector<T>&);
+	Population<N, T> solve(Agent<N> (*generator)());
 
 private:
-	// 目标函数
-	FuncTF _tf;
-	// 变异因子
-	FuncF _f;
-	// 交叉因子
-	FuncCR _cr;
-	// 种群数量，最大迭代次数
-	int _np, _g;
-	// 最小极差
-	T _eps;
+	
+	FuncTF _tf; // 目标函数
+	FuncF _f; // 变异因子
+	FuncCR _cr; // 交叉因子
+	int _np, _g; // 种群数量，最大迭代次数
 
 	int sgn(T) const;
 };
 
 template<size_t N, typename T, typename FuncTF, typename FuncF, typename FuncCR>
-inline DE<N, T, FuncTF, FuncF, FuncCR>::DE(FuncTF tf, FuncF f, FuncCR cr, int g, int np, T eps) :
-	_tf(tf), _f(f), _cr(cr), _np(np), _g(g), _eps(eps)
+inline DE<N, T, FuncTF, FuncF, FuncCR>::DE(FuncTF tf, FuncF f, FuncCR cr, int g, int np) :
+	_tf(tf), _f(f), _cr(cr), _np(np), _g(g)
 { }
 
 template<size_t N, typename T, typename FuncTF, typename FuncF, typename FuncCR>
-inline Population<N, T> DE<N, T, FuncTF, FuncF, FuncCR>::solve(const std::vector<T>& l, const std::vector<T>& u)
+inline Population<N, T> DE<N, T, FuncTF, FuncF, FuncCR>::solve(Agent<N> (*generator)())
 {
-	Population<N, T> res(l, u);
+	Population<N, T> res(generator);
 	for (auto g = 0; g < _g; g++)
 	{
 		res.fit(_tf);

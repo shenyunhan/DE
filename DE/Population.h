@@ -9,25 +9,28 @@ template<size_t N, typename T = double>
 class Population
 {
 public:
-	Population(int = 10);
-	Population(const std::vector<T>&, const std::vector<T>&, int = 10);
-	Population(const Population&);
+	Population(int np = 10);
+	Population(Agent<N> (*generator)(), int np = 10);
+	Population(const Population& p);
 
-	Agent<N, T>& operator[](int);
-	Agent<N, T> operator[](int) const;
-	Agent<N, T>& at(int);
-	Agent<N, T> at(int) const;
+	Agent<N, T>& operator[](int i);
+	Agent<N, T> operator[](int i) const;
+	Agent<N, T>& at(int i);
+	Agent<N, T> at(int i) const;
 
 	// 进化
 	template<typename FuncTF, typename FuncF, typename FuncCR>
-	Population evolution(FuncTF, FuncF, FuncCR);
-	// 计算种群中每个个题是适应度
+	Population evolution(FuncTF tf, FuncF f, FuncCR cr);
+	// 计算种群中每个个体的适应度
 	template<typename FuncTF>
-	void fit(FuncTF);
+	void fit(FuncTF tf);
 	// 获取种群中最好适应度
 	T get_best_fit() const;
 	// 获取种群中最差适应度
 	T get_worst_fit() const;
+
+	Agent<N, T> get_best_agent() const;
+	Agent<N, T> get_worat_agent() const;
 
 private:
 	// 种群大小
@@ -37,51 +40,65 @@ private:
 	// 每个个体的适应度
 	std::vector<T> _fit;
 	// 最好适应度和最差适应度
-	T _fit_min, _fit_max;
+	T _best_fit, _worst_fit;
+
+	Agent<N, T> _best_agent, _worst_agent;
 
 	// 变异
 	template<typename FuncF>
-	Population variation(FuncF) const;
+	Population variation(FuncF cf) const;
 	// 交叉
 	template<typename FuncCR>
-	Population cross(const Population&, FuncCR) const;
+	Population cross(const Population& p, FuncCR cr) const;
 	// 选择
 	template<typename FuncTF>
-	Population selection(const Population&, FuncTF) const;
+	Population selection(const Population& p, FuncTF tf) const;
 };
 
 template<size_t N, typename T>
 inline Population<N, T>::Population(int np) :
 	_np(np), _agents(np), _fit(np),
-	_fit_min(std::numeric_limits<T>::max()),
-	_fit_max(std::numeric_limits<T>::min())
+	_best_fit(std::numeric_limits<T>::max()),
+	_worst_fit(std::numeric_limits<T>::min())
 { }
 
 template<size_t N, typename T>
-inline Population<N, T>::Population(const std::vector<T>& l, const std::vector<T>& u, int np) :
+inline Population<N, T>::Population(Agent<N> (*generator)(), int np) :
 	_np(np), _agents(np), _fit(np),
-	_fit_min(std::numeric_limits<T>::max()),
-	_fit_max(std::numeric_limits<T>::min())
+	_best_fit(std::numeric_limits<T>::max()),
+	_worst_fit(std::numeric_limits<T>::min())
 {
 	for (auto i = 0; i < np; i++)
-		_agents[i] = Agent<N, T>(l, u);
+		_agents[i] = generator();
 }
 
 template<size_t N, typename T>
 inline Population<N, T>::Population(const Population& p) :
-	_np(p._np), _agents(p._agents), _fit(p._fit), _fit_min(p._fit_min), _fit_max(p._fit_max)
+	_np(p._np), _agents(p._agents), _fit(p._fit), _best_fit(p._best_fit), _worst_fit(p._worst_fit)
 { }
 
 template<size_t N, typename T>
 inline T Population<N, T>::get_best_fit() const
 {
-	return _fit_min;
+	return _best_fit;
 }
 
 template<size_t N, typename T>
 inline T Population<N, T>::get_worst_fit() const
 {
-	return _fit_max;
+	return _worst_fit;
+}
+
+template<size_t N, typename T>
+inline Agent<N, T> Population<N, T>::get_best_agent() const
+{
+	return _best_agent;
+}
+
+template<size_t N, typename T>
+inline Agent<N, T> Population<N, T>::get_worat_agent() const
+{
+	return _worst_agent;
 }
 
 template<size_t N, typename T>
@@ -135,7 +152,7 @@ inline Population<N, T> Population<N, T>::cross(const Population& p, FuncCR cr) 
 	Population res(_np);
 	for (auto i = 0; i < _np; i++)
 		for (auto j = 0; j < N; j++)
-			res[i][j] = (T)rand() / RAND_MAX < cr(_fit[i], _fit_min, _fit_max) ?
+			res[i][j] = (T)rand() / RAND_MAX < cr(_fit[i], _best_fit, _worst_fit) ?
 				_agents[i][j] : p[i][j];
 	return res;
 }
@@ -172,7 +189,15 @@ inline void Population<N, T>::fit(FuncTF tf)
 	for (auto i = 0; i < _np; i++)
 	{
 		_fit[i] = tf(_agents[i]);
-		_fit_min = std::min(_fit_min, _fit[i]);
-		_fit_max = std::max(_fit_max, _fit[i]);
+		if (_fit[i] < _best_fit)
+		{
+			_best_fit = _fit[i];
+			_best_agent = _agents[i];
+		}
+		if (_fit[i] > _worst_fit)
+		{
+			_worst_fit = _fit[i];
+			_worst_agent = _agents[i];
+		}
 	}
 }

@@ -9,7 +9,6 @@ class Agent
 {
 public:
 	Agent();
-	Agent(const std::vector<T>&, const std::vector<T>&);
 
 	T& operator[](int);
 	T operator[](int) const;
@@ -28,13 +27,6 @@ private:
 template<size_t N, typename T>
 inline Agent<N, T>::Agent() : _x(N, 0)
 { }
-
-template<size_t N, typename T>
-inline Agent<N, T>::Agent(const std::vector<T>& l, const std::vector<T>& u) : _x(N)
-{
-	for (auto i = 0; i < N; i++)
-		_x[i] = l[i] + ((T)rand() / RAND_MAX) * (u[i] - l[i]);
-}
 
 template<size_t N, typename T>
 inline T& Agent<N, T>::operator[](int i)
