@@ -6,6 +6,7 @@ struct Radar
 	Point<> x; // 坐标
 	double P; // 发射峰值功率
 	double G; // 天线增益
+	double Gphi; // 干扰方向增益
 	double sigma; // 截面积
 	double lambda; // 波长
 	double L; // 系统损耗

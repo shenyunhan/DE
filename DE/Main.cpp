@@ -58,12 +58,8 @@ double tf(const Agent<_ATTR>& agent)
 	{
 		double sum = 0;
 		for (int j = 0; j < n_ecm; j++)
-		{
-			// TODO: calculate phi
-			double phi = 0;
-			sum += ecms[j].getR(phi);
-		}
-		sum *= radars[i].L * radars[i].Br;
+			sum += ecms[j].getR();
+		sum *= 4 * PI * radars[i].L * radars[i].Gphi * radars[i].Br;
 		double R = radars[i].getR(sum);
 		for (int j = 0; j < n_ecm; j++)
 			res += (ecms[j].P * ecms[j].G) / (radars[i].P * radars[i].G) * (4 * PI * sqr(R) / radars[i].sigma);
@@ -89,7 +85,7 @@ int main()
 		center = center + radars[i].x;
 	}
 	center = center / (double)n_radar;
-	DE<_ATTR> de(tf);
+	DE<_ATTR> de(8 * _ATTR, 30, tf);
 	auto res = de.solve(generator).get_best_agent();
 	for (int i = 0; i < n_ecm; i++)
 	{

@@ -11,6 +11,8 @@ void Radar::read()
 	std::cin >> P;
 	std::cout << "\t输入天线增益G";
 	std::cin >> G;
+	std::cout << "\t输入干扰方向增益Gφ";
+	std::cin >> Gphi;
 	std::cout << "\t输入雷达截面积σ：";
 	std::cin >> sigma;
 	std::cout << "\t输入波长λ：";

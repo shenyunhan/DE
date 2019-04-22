@@ -9,5 +9,5 @@ struct ECM
 	double L; // пе╨евш╨окП╨д
 
 	void read();
-	double getR(double phi);
+	double getR();
 };

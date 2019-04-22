@@ -16,7 +16,7 @@ void ECM::read()
 	std::cin >> L;
 }
 
-double ECM::getR(double phi)
+double ECM::getR()
 {
-	return (4 * PI * P * G * r/* * G(phi)*/) / (cub(B) * L);
+	return (P * G * r) / (cub(B) * L);
 }
