@@ -74,7 +74,9 @@ inline Population<N, T>::Population(Agent<N> (*generator)(), int np) :
 
 template<size_t N, typename T>
 inline Population<N, T>::Population(const Population& p) :
-	_np(p._np), _agents(p._agents), _fit(p._fit), _best_fit(p._best_fit), _worst_fit(p._worst_fit)
+	_np(p._np), _agents(p._agents), _fit(p._fit),
+	_best_fit(p._best_fit), _worst_fit(p._worst_fit),
+	_best_agent(p._best_agent), _worst_agent(p._worst_agent)
 { }
 
 template<size_t N, typename T>

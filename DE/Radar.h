@@ -15,8 +15,8 @@ struct Radar
 	double Bn; // 噪声带宽
 	double Br; // 接收机信号带宽
 	double SN; // 信噪比
-	double R; // 探测范围
 	double K; // 最小压制系数
+	double R; // 探测范围
 
 	void read();
 	void getR();

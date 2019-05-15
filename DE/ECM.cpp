@@ -14,6 +14,8 @@ void ECM::read()
 	std::cin >> B;
 	std::cout << "\tÊäÈëÐÅºÅ×ÛºÏËðºÄL£º";
 	std::cin >> L;
+	P *= 1000;
+	B *= 1000;
 }
 
 double ECM::getR()

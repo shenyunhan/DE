@@ -49,7 +49,11 @@ inline Population<N, T> DE<N, T, FuncTF, FuncF, FuncCR>::solve(Agent<N> (*genera
 		res = res.evolution(_tf, _f, _cr);
 	}
 	res.fit(_tf);
-	return res;
+	/*auto best = res.get_best_agent();
+	for (auto i = 0; i < 9; i++)
+		std::cout << best[i] << " ";
+	std::cout << std::endl;*/
+	return std::move(res);
 }
 
 template<size_t N, typename T, typename FuncTF, typename FuncF, typename FuncCR>
