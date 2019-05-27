@@ -157,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Agent.h" />
+    <ClInclude Include="Circle.h" />
     <ClInclude Include="DE.h" />
     <ClInclude Include="ECM.h" />
     <ClInclude Include="Global.h" />

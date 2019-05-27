@@ -41,16 +41,16 @@ inline DE<N, T, FuncTF, FuncF, FuncCR>::DE(int g, int np, FuncTF tf, FuncF f, Fu
 template<size_t N, typename T, typename FuncTF, typename FuncF, typename FuncCR>
 inline Population<N, T> DE<N, T, FuncTF, FuncF, FuncCR>::solve(Agent<N> (*generator)())
 {
-	Population<N, T> res(generator);
+	Population<N, T> res(generator, _np);
 	for (auto g = 0; g < _g; g++)
 	{
 		res.fit(_tf);
-		if (sgn(res.get_best_fit() - res.get_worst_fit()) == 0) break;
+		//if (sgn(res.get_best_fit() - res.get_worst_fit()) == 0) break;
 		res = res.evolution(_tf, _f, _cr);
 	}
 	res.fit(_tf);
 	/*auto best = res.get_best_agent();
-	for (auto i = 0; i < 9; i++)
+	for (auto i = 0; i < 12; i++)
 		std::cout << best[i] << " ";
 	std::cout << std::endl;*/
 	return std::move(res);

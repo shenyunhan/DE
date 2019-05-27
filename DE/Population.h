@@ -3,6 +3,7 @@
 #include "Agent.h"
 #include <algorithm>
 #include <vector>
+#include <cassert>
 
 // ÷÷»∫
 template<size_t N, typename T = double>
@@ -141,6 +142,9 @@ inline Population<N, T> Population<N, T>::variation(FuncF f) const
 		if (_fit[a] < _fit[b]) std::swap(a, b);
 		if (_fit[a] < _fit[c]) std::swap(a, c);
 		if (_fit[b] < _fit[c]) std::swap(b, c);
+		assert(a < _np);
+		assert(b < _np);
+		assert(c < _np);
 		res[i] = _agents[a] + (_agents[b] - _agents[c]) * f(_fit[a], _fit[b], _fit[c]);
 	}
 	return res;
@@ -164,7 +168,7 @@ template<size_t N, typename T>
 template<typename FuncTF>
 inline Population<N, T> Population<N, T>::selection(const Population& p, FuncTF tf) const
 {
-	Population res;
+	Population res(_np);
 	for (auto i = 0; i < _np; i++)
 		res[i] = tf(_agents[i]) < tf(p[i]) ? _agents[i] : p[i];
 	return res;
@@ -181,6 +185,8 @@ inline Population<N, T> Population<N, T>::evolution(FuncTF tf, FuncF f, FuncCR c
 	//	printf(": %lf\n", _fit[i]);
 	//}
 	//printf("\n");
+	assert(_agents.size() == _np);
+	assert(_fit.size() == _np);
 	return selection(cross(variation(f), cr), tf);
 }
 
